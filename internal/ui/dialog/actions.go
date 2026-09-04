@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 
 	tea "charm.land/bubbletea/v2"
+
+	"github.com/charmbracelet/crush/internal/agent"
 	"charm.land/catwalk/pkg/catwalk"
 	"github.com/charmbracelet/crush/internal/commands"
 	"github.com/charmbracelet/crush/internal/config"
@@ -53,6 +55,10 @@ type (
 	ActionTogglePills             struct{}
 	ActionExternalEditor          struct{}
 	ActionToggleYoloMode          struct{}
+	ActionCycleAgentMode          struct{}
+	ActionSetAgentMode            struct {
+		Mode agent.AgentMode
+	}
 	ActionToggleNotifications     struct{}
 	ActionSelectNotificationStyle struct {
 		Style string

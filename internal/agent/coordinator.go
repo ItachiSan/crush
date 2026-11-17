@@ -110,6 +110,10 @@ func servingProvider(providerCfg config.ProviderConfig, model catwalk.Model) str
 
 type Coordinator interface {
 	SetMainAgent(agentName string) error
+	// MainAgentName reports the config name of the active main agent. The
+	// ACP adapter needs it to report the mode the workspace is actually in,
+	// which the spec requires to match what the Agent operates with.
+	MainAgentName() string
 	Run(ctx context.Context, sessionID, prompt string, attachments ...message.Attachment) (*fantasy.AgentResult, error)
 	// RunAccepted runs a call that was already accepted via
 	// BeginAccepted on the fire-and-forget dispatch path. The handle is
@@ -344,6 +348,15 @@ func (c *coordinator) SetMainAgent(agentName string) error {
 	c.mainAgent = agent
 	c.mainAgentName = agentName
 	return nil
+}
+
+// MainAgentName reports the config name of the active main agent. The name is
+// empty only before the coordinator is fully built, so callers must treat ""
+// as "unknown" rather than as an agent called "". It reads under the same lock
+// SetMainAgent takes, so a concurrent switch cannot be observed half-applied.
+func (c *coordinator) MainAgentName() string {
+	_, name := c.activeAgent()
+	return name
 }
 
 // Run implements Coordinator.
